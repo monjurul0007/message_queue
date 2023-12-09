@@ -73,7 +73,14 @@ model VerificationToken {
 }
 
 model ApiKey {
-    key       String  @id @db.Text
+    key       String   @id @db.Text
     expires   DateTime
+    createdBy String
+}
+
+model Messages {
+    id        Int     @id @default(autoincrement())
+    message   String
+    seen      Boolean @default(false)
     createdBy String
 }

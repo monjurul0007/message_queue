@@ -8,7 +8,7 @@ interface ButtonProps extends PropsWithChildren {
 const Button: FC<ButtonProps> = ({ children, className, onClick }) => {
   return (
     <button
-      className={`rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20 ${className}`}
+      className={`w-[400px] rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20 ${className}`}
       onClick={onClick}
     >
       {children}

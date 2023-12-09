@@ -15,6 +15,7 @@ import { ZodError } from "zod";
 
 import { getServerAuthSession } from "@/server/auth";
 import { db } from "@/server/db";
+import { type NextApiRequest } from "next";
 
 /**
  * 1. CONTEXT
@@ -26,6 +27,7 @@ import { db } from "@/server/db";
 
 interface CreateContextOptions {
   session: Session | null;
+  req: NextApiRequest;
 }
 
 /**
@@ -41,6 +43,7 @@ interface CreateContextOptions {
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
+    req: opts.req,
     db,
   };
 };
@@ -59,6 +62,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return createInnerTRPCContext({
     session,
+    req,
   });
 };
 
@@ -129,3 +133,29 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+const isKeyProtected = t.middleware(async ({ ctx, next }) => {
+  const { req, db } = ctx;
+  const key = req.headers.authorization?.split(" ")[1];
+
+  const keyFromDb = await db.apiKey.count({
+    where: {
+      expires: {
+        gte: new Date(),
+      },
+      key,
+    },
+  });
+
+  if (!key || keyFromDb <= 0) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({
+    ctx: {
+      apiKey: key,
+    },
+  });
+});
+
+export const apiKeyProtectedProcedure = t.procedure.use(isKeyProtected);

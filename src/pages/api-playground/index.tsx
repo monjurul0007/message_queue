@@ -20,7 +20,7 @@ const ApiPlayground = () => {
       <Button onClick={generateApiKey}>Click Here to generate API Key</Button>
 
       <div className="text-xl text-white ">
-        <span className="text-[hsl(280,100%,70%)]"> API endpoine: </span>
+        <span className="text-[hsl(280,100%,70%)]"> API endpoint: </span>
         /api/trpc/apiPlayground.apiKeyTest
       </div>
     </BaseBackground>
